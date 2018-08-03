@@ -35,6 +35,29 @@ In order to accomplish this, the API must fulfill the following use cases:
 
 The API must offer the following reports:
 
-  i. Percentage of abducted survivors.
-  ii. Percentage of non-abducted survivors.
-  iii. List of all survivors names, by alphabetic order, with an identification to know who was abducted.
+  1. Percentage of abducted survivors.
+  2. Percentage of non-abducted survivors.
+  3. List of all survivors names, by alphabetic order, with an identification to know who was abducted.
+
+## Routes
+
+Consider the base api as ''http://localhost:3000, the following routes are implemented:
+
+''GET /api/v1/survivors
+Returns response.survivors, wich is an array of all survivors
+
+''POST /api/v1/survivors
+Inserts the json sent in the database
+
+json example:
+''{
+''  "name": "Jacob",
+''  "age": 20,
+''  "gender": "m",
+''  "latitude": -76.4560
+''  "longitude": 32.8909
+''}
+
+
+''GET /api/v1/survivors/:id
+Returns response.survivor, wich is the one indicated by the id
