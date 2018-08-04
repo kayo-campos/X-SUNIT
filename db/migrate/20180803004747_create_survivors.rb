@@ -6,6 +6,7 @@ class CreateSurvivors < ActiveRecord::Migration[5.2]
       t.string :gender
       t.float :latitude
       t.float :longitude
+      t.boolean :alive
 
       t.timestamps
     end

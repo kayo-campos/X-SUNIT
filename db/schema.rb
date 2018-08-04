@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_03_004747) do
+ActiveRecord::Schema.define(version: 2018_08_04_030857) do
+
+  create_table "abduction_reports", force: :cascade do |t|
+    t.integer "survivor_id"
+    t.integer "witness_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "survivors", force: :cascade do |t|
     t.string "name"
@@ -18,6 +25,7 @@ ActiveRecord::Schema.define(version: 2018_08_03_004747) do
     t.string "gender"
     t.float "latitude"
     t.float "longitude"
+    t.boolean "abducted"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
