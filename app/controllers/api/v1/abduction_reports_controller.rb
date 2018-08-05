@@ -2,7 +2,6 @@ module Api
     module V1
         class AbductionReportsController < ApplicationController
             def create
-
                 ## A survivor shouldn't be able to report his own abduction since he's probably in the UFO
                 if params[:survivor_id] == params[:witness_id]
                     render json: {
@@ -29,9 +28,7 @@ module Api
                         status: 'SUCCESS',
                         data: abductionReport
                     }, status: :ok
-
                 end
-
             end
 
             private
@@ -39,10 +36,10 @@ module Api
                 params.permit(:survivor_id, :witness_id)
             end
 
+            ## Side-function to count how many witnesses reported survivor abduction
             def find_witnesses(survivor_id, witness_id)
                 survivorAbductionReports = AbductionReport.where('survivor_id == ?', survivor_id)
-                witnessesReportingAbduction = survivorAbductionReports.map { |report| report[:witness_id] }
-                witnessesReportingAbduction = witnessesReportingAbduction.uniq.count
+                witnessesReportingAbduction = survivorAbductionReports.map { |report| report[:witness_id] }.uniq.count
                 return witnessesReportingAbduction
             end
         end

@@ -6,6 +6,7 @@ module Api
             def index
                 survivors = Survivor.order('name ASC')
                 abductedPercentage = get_abducted_percentage(survivors)
+                ## If there are no survivors, it just makes sense 0% of them is abducted and 0% of then is non-abducted
                 if survivors.count == 0
                     nonAbductedPercentage = 0
                 else
