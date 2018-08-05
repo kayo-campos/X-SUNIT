@@ -12,72 +12,82 @@ module Api
                 else
                     nonAbductedPercentage = 100 - abductedPercentage
                 end
-                render json: {
-                    status: 'SUCCESS',
-                    data: survivors,
+                status = 'SUCCESS'
+                data = {
+                    survivors: survivors,
                     abductedPercentage: abductedPercentage,
                     nonAbductedPercentage: nonAbductedPercentage
-                }, status: :ok
+                }
+                statusCode = 200
+                render_response(status, data, statusCode)
             end
 
             ## Get only the survivor wich id was passed via url param
             def show
                 survivor = Survivor.find(params[:id])
-                render json: {
-                    status: 'SUCCESS',
-                    data: survivor
-                }, status: :ok
+                status = 'SUCCESS'
+                data = {
+                    survivor: survivor
+                }
+                statusCode = 200
+                render_response(status, data, statusCode)
             end
 
             ## Creates a new survivor
             def create
                 survivor = Survivor.new(survivor_params)
-                if survivor.save
-                    survivor.create_location(
-                        latitude: params[:latitude],
-                        longitude: params[:longitude]
-                    )
-                    render json: {
-                        status: 'SUCCESS',
-                        data: survivor
-                    }, status: :ok
+                if survivor.save and survivor.create_location(latitude: params[:latitude], longitude: params[:longitude])
+                    status = 'SUCCESS'
+                    data = {
+                        survivor: survivor,
+                        survivorLocation: survivor.location
+                    }
+                    statusCode = 200
                 else
-                    render json: {
-                        status: 'ERROR',
-                        message: "couldn't save survivor to database"
-                    }, status: :ok
+                    status = 'ERROR'
+                    data = {
+                        message: "couldn't create survivor"
+                    }
+                    statusCode = 400
                 end
+                render_response(status, data, statusCode)
             end
 
             ## Deletes a survivor
             def destroy
                 survivor = Survivor.find(params[:id])
+                abductionReports = AbductionReport.where("witness_id == ?", survivor.id).each { |report| report.destroy }
                 if survivor.destroy
-                    render json: {
-                        status: 'SUCCESS',
+                    status = 'SUCCESS'
+                    data = {
                         message: 'survivor deleted'
-                    }, status: :ok
+                    }
+                    statusCode = 200
                 else
-                    render json: {
-                        status: 'ERROR',
+                    status = 'ERROR'
+                    data = {
                         message: "couldn't delete survivor"
                     }
+                    statusCode = 400
                 end
+                render_response(status, data, statusCode)
             end
 
+            ## Updates survivor information, but doesn't change his location (that's locations_controller business)
             def update
                 survivor = Survivor.find(params[:id])
                 if survivor.update(survivor_params)
-                    render json: {
-                        status: 'SUCCESS',
-                        data: survivor
-                    }, status: :ok
+                    status = 'SUCCESS'
+                    data = {
+                        survivor: survivor
+                    }
                 else
-                    render json: {
-                        status: 'ERROR',
+                    status = 'ERROR',
+                    data = {
                         message: "couldn't update survivor information"
-                    }, status: :unprocessable_entry
+                    }
                 end
+                render_response(status, data, statusCode)
             end
 
 
@@ -87,7 +97,7 @@ module Api
                 params.permit(:name, :age, :gender)
             end
 
-            ## Side-function so it gets easier to change some logic
+            ## Side-function so it gets easier to change some logic in the abducted percentage calculation
             def get_abducted_percentage(survivorsArray)
                 size = survivorsArray.count
                 if size == 0
@@ -97,6 +107,14 @@ module Api
                     abductedPercentage = (100 * abductedCount) / size
                     return abductedPercentage
                 end
+            end
+
+            ## Side-function to handle HTTP responses, since they follow a pattern of STATUS_CODE, STATUS_MESSAGE and DATA
+            def render_response(status, data, statusCode)
+                render json: {
+                    status: status,
+                    data: data
+                }, status: statusCode
             end
 
         end

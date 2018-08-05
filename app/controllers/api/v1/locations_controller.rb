@@ -9,7 +9,7 @@ module Api
                 }, status: :ok
             end
 
-            def create
+            def update
                 survivor =  Survivor.find(params[:survivor_id])
                 if survivor.location.update(location_params)
                     render json: {

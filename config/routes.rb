@@ -2,9 +2,9 @@ Rails.application.routes.draw do
   namespace 'api' do
     namespace 'v1' do
       resources :survivors do
-        resources :locations
+        resource :location
+        resources :abduction_reports
       end
-      resources :abduction_reports
     end
   end
 end
