@@ -6,7 +6,11 @@ module Api
             def index
                 survivors = Survivor.order('name ASC')
                 abductedPercentage = get_abducted_percentage(survivors)
-                nonAbductedPercentage = 100 - abductedPercentage
+                if survivors.count == 0
+                    nonAbductedPercentage = 0
+                else
+                    nonAbductedPercentage = 100 - abductedPercentage
+                end
                 render json: {
                     status: 'SUCCESS',
                     data: survivors,
