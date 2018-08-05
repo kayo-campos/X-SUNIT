@@ -33,6 +33,10 @@ module Api
             def create
                 survivor = Survivor.new(survivor_params)
                 if survivor.save
+                    survivor.create_location(
+                        latitude: params[:latitude],
+                        longitude: params[:longitude]
+                    )
                     render json: {
                         status: 'SUCCESS',
                         data: survivor
@@ -40,28 +44,30 @@ module Api
                 else
                     render json: {
                         status: 'ERROR',
-                        data: survivor.errors
-                    }, status: :unprocessable_entry
+                        message: "couldn't save survivor to database"
+                    }, status: :ok
                 end
             end
 
             ## Deletes a survivor
             def destroy
                 survivor = Survivor.find(params[:id])
-                survivor.destroy
-                render json: {
-                    status: 'SUCCESS',
-                    message: 'Survivor deleted'
-                }, status: :ok
+                if survivor.destroy
+                    render json: {
+                        status: 'SUCCESS',
+                        message: 'survivor deleted'
+                    }, status: :ok
+                else
+                    render json: {
+                        status: 'ERROR',
+                        message: "couldn't delete survivor"
+                    }
+                end
             end
 
-            ## Updates the survivor location
-            ## IMPORTANT: to this method, the json passed
-            ## must contain ONLY latitude and longitude
-            ## any other value will be disregarded
             def update
                 survivor = Survivor.find(params[:id])
-                if survivor.update(localization_params)
+                if survivor.update(survivor_params)
                     render json: {
                         status: 'SUCCESS',
                         data: survivor
@@ -69,7 +75,7 @@ module Api
                 else
                     render json: {
                         status: 'ERROR',
-                        message: "Couldn't update survivor location"
+                        message: "couldn't update survivor information"
                     }, status: :unprocessable_entry
                 end
             end
@@ -78,14 +84,8 @@ module Api
             ## Some validations to http methods
             private
             def survivor_params
-                params.permit(:name, :age, :gender, :latitude, :longitude)
+                params.permit(:name, :age, :gender)
             end
-
-            private
-            def localization_params
-                params.permit(:latitude, :longitude)
-            end
-
 
             ## Side-function so it gets easier to change some logic
             def get_abducted_percentage(survivorsArray)
