@@ -14,7 +14,10 @@ Once upon a time I was looking for a way to make a more consistent development w
 
 At first, I had the following models:
 
+![first database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/first_model_diagram.png?token=AZkDI85UJI6Pen68Tes_lBFXzi4od_C0ks5bchkOwA%3D%3D)
+
 Two models were everything I needed to represent all the information the problem wanted. It became a problem when I realized updating a survivor location and updating a survivor information isn't the same thing to the problem (keep in mind that the real-world-information-as-data thing also applies to real world actions and functions/methods/routines, their representations in a computational world). The solution was clear: create a model to locations. Then, another problem: after a few commits I found out about the [rails n + 1 problem](https://semaphoreci.com/blog/2017/08/09/faster-rails-eliminating-n-plus-one-queries.html), which made worry about consulting the database. From the beggining, I had the idea to keep auxiliary counters in database, just didn't know if it was worth. When I read about this, even not being a problem I had, I made sure to create a new table and consult database once, instead of getting data from it, then iterating over an array, filtering abducted survivors and etc... It's just avoidable complication. With these ideas, the models diagram became this:
+![final database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/final_model_diagram.png?token=AZkDI8mrsk2N2mKnk92_Fl-nvigxHdznks5bchkiwA%3D%3D)
 
 ### Adapting to REST pattern
 
