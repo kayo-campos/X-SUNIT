@@ -63,6 +63,7 @@ returns a list of all survivors sorted by name
     POST /api/v1/survivors
 
 allow you to insert a new survivor to the database, as long as you pass a JSON following the example:
+
     {
         "name": "Jhon",
         "age": 24,
