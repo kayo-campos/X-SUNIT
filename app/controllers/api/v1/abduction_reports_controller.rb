@@ -25,6 +25,7 @@ module Api
                     data = {
                         message: "an abducted survivor can't report another survivor abduction"
                     }
+                    statusCode = 400
                 else
                     abductionReport = AbductionReport.new(abduction_report_params)
                     abductionReport.save
