@@ -1,3 +1,5 @@
+require_relative 'auxiliary_functions'
+
 module Api
     module V1
         class SurvivorsController < ApplicationController
@@ -5,18 +7,9 @@ module Api
             ## Gets all survivors and calculates abducted and non-abducted percentages
             def index
                 survivors = Survivor.order('name ASC')
-                abductedPercentage = get_abducted_percentage(survivors)
-                ## If there are no survivors, it just makes sense 0% of them is abducted and 0% of then is non-abducted
-                if survivors.count == 0
-                    nonAbductedPercentage = 0
-                else
-                    nonAbductedPercentage = 100 - abductedPercentage
-                end
                 status = 'SUCCESS'
                 data = {
-                    survivors: survivors,
-                    abductedPercentage: abductedPercentage,
-                    nonAbductedPercentage: nonAbductedPercentage
+                    survivors: survivors
                 }
                 statusCode = 200
                 render_response(status, data, statusCode)
@@ -37,6 +30,7 @@ module Api
             def create
                 survivor = Survivor.new(survivor_params)
                 if survivor.save and survivor.create_location(latitude: params[:latitude], longitude: params[:longitude])
+                    update_auxiliary_count(1, :+)
                     status = 'SUCCESS'
                     data = {
                         survivor: survivor,
@@ -56,8 +50,13 @@ module Api
             ## Deletes a survivor
             def destroy
                 survivor = Survivor.find(params[:id])
-                abductionReports = AbductionReport.where("witness_id == ?", survivor.id).each { |report| report.destroy }
+                AbductionReport.where("witness_id == ?", survivor.id).each { |report| report.destroy }
                 if survivor.destroy
+                    if survivor.abducted
+                        update_auxiliary_count(2, :-)
+                    else
+                        update_auxiliary_count(1, :-)
+                    end
                     status = 'SUCCESS'
                     data = {
                         message: 'survivor deleted'
@@ -81,11 +80,13 @@ module Api
                     data = {
                         survivor: survivor
                     }
+                    statusCode = 200
                 else
                     status = 'ERROR',
                     data = {
                         message: "couldn't update survivor information"
                     }
+                    statusCode = 400
                 end
                 render_response(status, data, statusCode)
             end
@@ -97,26 +98,16 @@ module Api
                 params.permit(:name, :age, :gender)
             end
 
-            ## Side-function so it gets easier to change some logic in the abducted percentage calculation
-            def get_abducted_percentage(survivorsArray)
-                size = survivorsArray.count
-                if size == 0
-                    return 0
-                else
-                    abductedCount = survivorsArray.count{ |survivor| survivor[:abducted] }
-                    abductedPercentage = (100 * abductedCount) / size
-                    return abductedPercentage
+            ## Side-function so it gets easier to change some logic in the auxiliary counters
+            private
+            def update_auxiliary_count(id, operation)
+                survivorsAuxiliaryCounter = AuxiliaryCounter.find_by(id: id)
+                if operation == :+
+                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count + 1)
+                elsif operation == :-
+                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count - 1)
                 end
             end
-
-            ## Side-function to handle HTTP responses, since they follow a pattern of STATUS_CODE, STATUS_MESSAGE and DATA
-            def render_response(status, data, statusCode)
-                render json: {
-                    status: status,
-                    data: data
-                }, status: statusCode
-            end
-
         end
     end
 end

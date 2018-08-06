@@ -10,11 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_05_043844) do
+ActiveRecord::Schema.define(version: 2018_08_06_033417) do
 
   create_table "abduction_reports", force: :cascade do |t|
     t.integer "survivor_id"
     t.integer "witness_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "auxiliary_counters", force: :cascade do |t|
+    t.string "label"
+    t.integer "count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

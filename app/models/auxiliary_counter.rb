@@ -1,0 +1,2 @@
+class AuxiliaryCounter < ApplicationRecord
+end
