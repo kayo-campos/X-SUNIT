@@ -140,7 +140,7 @@ Say you just want to know about quantities and percentages and not to worry abou
 
 and you have the needed information in response.data.
 
-## And about the avaliation?
+## And about the evaluation?
 
 Well, this challenge really made me try my best. I spent hours learning how to do stuff in a language I never used before and I'm really into Rails, even with a node-mind, it wasn't that hard to code this, since Rails really helps the programmer.
 
