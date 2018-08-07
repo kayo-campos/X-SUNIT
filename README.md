@@ -33,13 +33,13 @@ If RoR says "Convention over Configuration", who am I to say the opposite? Havin
 
 ### The survivors abduction
 
-To report an abduction, a survivor and a witness are required, as a few things need to be validated (and you can find everything well explained in the body of the functions in [abduction_reports_controller.rb](app/controllers/api/v1/abduction_reports/controller.rb)):
+To report an abduction, a survivor and a witness are required, as a few things need to be validated (and you can find everything well explained in the body of the functions in [abduction_reports_controller.rb](app/controllers/api/v1/abduction_reports_controller.rb)):
 
 1. Do the survivors involved in an abduction report acctually exist?
 2. Are the witness and the survivor different people?
 3. Is it the first time this witness is reporting this abduction?
 
-If the answer to all these questions is "yes", then it's ok to report this abduction. And at last, if the survivor has been reported as abducted at least three times AND this information isn't in the database already, then he should be flagged as abducted and the propper auxiliary counters modified.
+If the answer to all these questions is "yes", then it's ok to report this abduction. And at last, if the survivor has been reported as abducted at least three times AND this information isn't in the database already, then he should be flagged as abducted.
 
 With this planned, coding it became easier.
 
@@ -76,7 +76,7 @@ OBS - I strongly suggest you test it with Postman or Insomnia or whatever you ma
 
 ## And what about using the API?
 
-I tried to strict follow the REST pattern, so, in topics:
+I tried to strictly follow the REST pattern, so, in topics:
 
 ### Survivors
 
@@ -106,7 +106,7 @@ let you update survivor with the informed id information, since you pass a JSON 
 
     DELETE /api/v1/survivors/:id
 
-deletes the survivor with the informed id, all related information in other tables (location and abduction reports) and updates auxiliary counters as needed.
+deletes the survivor with the informed id, all related information in other tables (location and abduction reports).
 
 ### Locations
 
