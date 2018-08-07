@@ -3,6 +3,8 @@ require_relative 'auxiliary_functions'
 module Api
     module V1
         class AbductionReportsController < ApplicationController
+            
+            ## Create a new abduction report
             def create
                 ## Having a reference to survivor and witness objects, we make sure they exist
                 survivor = Survivor.find(params[:survivor_id])
@@ -36,12 +38,13 @@ module Api
                 params.permit(:survivor_id, :witness_id)
             end
 
-            ## Side-function to count how many witnesses reported survivor abduction
+            ## Side-function to count how many witnesses reported survivor abductions
             private
-            def find_witnesses(survivor, witness_id)
-                return survivor.abduction_reports.map { |report| report[:witness_id] }.uniq.count
+            def find_witnesses(survivor_id, witness_id)
+                survivorAbductionReports = AbductionReport.where('survivor_id == ?', survivor_id)
+                witnessesReportingAbduction = survivorAbductionReports.map { |report| report[:witness_id] }.uniq.count
+                return witnessesReportingAbduction
             end
-
 
             ## Side-function so the code gets clean
             private

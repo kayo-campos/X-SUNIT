@@ -85,9 +85,10 @@ module Api
                 render_response(status, data, statusCode)
             end
 
+            ## Not involved in Survivors CRUD, this function is called when hitting '/api/v1/general-information'
             def general_information
-                abductedCount = Survivor.abducted.count
-                nonAbductedCount = Survivor.non_abducted.count
+                abductedCount = Survivor.abducted.size
+                nonAbductedCount = Survivor.non_abducted.size
                 survivorsCount = abductedCount + nonAbductedCount
                 if survivorsCount == 0
                     abductedPercentage = 0
@@ -111,10 +112,6 @@ module Api
                 statusCode = 200
 
                 render_response(status, data, statusCode)
-            end
-
-            def get_percentage(maximumValue, acctualValue)
-                return (100 * acctualValue) / maximumValue
             end
 
             ## Some validations to http methods
