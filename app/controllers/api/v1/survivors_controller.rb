@@ -3,7 +3,7 @@ require_relative 'auxiliary_functions'
 module Api
     module V1
         class SurvivorsController < ApplicationController
-            
+
             ## Gets all survivors and calculates abducted and non-abducted percentages
             def index
                 survivors = Survivor.order('name ASC')
@@ -30,7 +30,6 @@ module Api
             def create
                 survivor = Survivor.new(survivor_params)
                 if survivor.save and survivor.create_location(latitude: params[:latitude], longitude: params[:longitude])
-                    update_auxiliary_count(1, :+)
                     status = 'SUCCESS'
                     data = {
                         survivor: survivor,
@@ -52,11 +51,6 @@ module Api
                 survivor = Survivor.find(params[:id])
                 AbductionReport.where("witness_id == ?", survivor.id).each { |report| report.destroy }
                 if survivor.destroy
-                    if survivor.abducted
-                        update_auxiliary_count(2, :-)
-                    else
-                        update_auxiliary_count(1, :-)
-                    end
                     status = 'SUCCESS'
                     data = {
                         message: 'survivor deleted'
@@ -91,22 +85,42 @@ module Api
                 render_response(status, data, statusCode)
             end
 
+            def general_information
+                abductedCount = Survivor.abducted.count
+                nonAbductedCount = Survivor.non_abducted.count
+                survivorsCount = abductedCount + nonAbductedCount
+                if survivorsCount == 0
+                    abductedPercentage = 0
+                    nonAbductedPercentage = 0
+                else
+                    abductedPercentage = get_percentage(survivorsCount, abductedCount)
+                    nonAbductedPercentage = 100 - abductedPercentage
+                end
+                status = 'SUCCES'
+                data = {
+                    survivors_count: survivorsCount,
+                    abducted: {
+                        count: abductedCount,
+                        percentage: abductedPercentage
+                    },
+                    non_abducted: {
+                        count: nonAbductedCount,
+                        percentage: nonAbductedPercentage
+                    }
+                }
+                statusCode = 200
+
+                render_response(status, data, statusCode)
+            end
+
+            def get_percentage(maximumValue, acctualValue)
+                return (100 * acctualValue) / maximumValue
+            end
 
             ## Some validations to http methods
             private
             def survivor_params
                 params.permit(:name, :age, :gender)
-            end
-
-            ## Side-function so it gets easier to change some logic in the auxiliary counters
-            private
-            def update_auxiliary_count(id, operation)
-                survivorsAuxiliaryCounter = AuxiliaryCounter.find_by(id: id)
-                if operation == :+
-                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count + 1)
-                elsif operation == :-
-                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count - 1)
-                end
             end
         end
     end

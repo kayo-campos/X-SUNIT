@@ -14,8 +14,6 @@ module Api
                     witnessesReportingAbduction = find_witnesses(params[:survivor_id], params[:witness_id])
                     if witnessesReportingAbduction >= 3 and survivor[:abducted] == false
                         survivor.update(abducted: true)
-                        update_auxiliary_count(1, :-)
-                        update_auxiliary_count(2, :+)
                     end
                     status = 'SUCCES'
                     data = {
@@ -40,10 +38,8 @@ module Api
 
             ## Side-function to count how many witnesses reported survivor abduction
             private
-            def find_witnesses(survivor_id, witness_id)
-                survivorAbductionReports = AbductionReport.where('survivor_id == ?', survivor_id)
-                witnessesReportingAbduction = survivorAbductionReports.map { |report| report[:witness_id] }.uniq.count
-                return witnessesReportingAbduction
+            def find_witnesses(survivor, witness_id)
+                return survivor.abduction_reports.map { |report| report[:witness_id] }.uniq.count
             end
 
 
@@ -65,17 +61,6 @@ module Api
                     message = "abduction reported"
                 end
                 return { status: status, message: message }
-            end
-
-            ## Side-function so the code gets clean
-            private
-            def update_auxiliary_count(id, operation)
-                survivorsAuxiliaryCounter = AuxiliaryCounter.find_by(id: id)
-                if operation == :+
-                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count + 1)
-                elsif operation == :-
-                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count - 1)
-                end
             end
         end
     end

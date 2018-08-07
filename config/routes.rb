@@ -5,7 +5,7 @@ Rails.application.routes.draw do
         resource :location, only: [:show, :update]
         resources :abduction_reports, only: [:create]
       end
-      get '/general-information' => 'auxiliary_counters#index'
+      get '/general-information' => 'survivors#general_information'
     end
   end
 end
