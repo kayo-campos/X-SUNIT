@@ -8,16 +8,16 @@ All the problem specifications, as the necessarry material to solve it can be fo
 
 ## How it was planned
 
-Once upon a time I was looking for a way to make a more consistent development with a REST api approach and a client to consume this api and found a very interesting idea: you should start by making sure your api is consistent, then you move to the client-side. Later, reading [How to Design Programs](https://htdp.org), I found another interesting conecpt: programs treat real world information as data, so ycou should start by planning how to represent it in a computational world. With these two concepts in mind, first thing done was defining models, which makes it possible that the api is consistent.
+Once upon a time I was looking for a way to make a more consistent development with a REST api approach and a client to consume this api and found a very interesting idea: you should start by making sure your api is consistent, then you move to the client-side. Later, reading [How to Design Programs](https://htdp.org), I found another interesting conecpt: programs treat real world information as data, so you should start by planning how to represent information in a computational world. With these two concepts in mind, first thing done was defining models, which makes it possible that the api is consistent.
 
 ### Defining Models
 
 At first, I had the following models:
 
-![first database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/first_model_diagram.png?token=AZkDI85UJI6Pen68Tes_lBFXzi4od_C0ks5bchkOwA%3D%3D)
+![first database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/first_model_diagram.png)
 
-Two models were everything I needed to represent all the information the problem wanted. It became a problem when I realized updating a survivor location and updating a survivor information isn't the same thing to the problem (keep in mind that the real-world-information-as-data thing also applies to real world actions and functions/methods/routines, their representations in a computational world). The solution was clear: create a model to locations. Then, another problem: after a few commits I found out about the [rails n + 1 problem](https://semaphoreci.com/blog/2017/08/09/faster-rails-eliminating-n-plus-one-queries.html), which made worry about consulting the database. From the beggining, I had the idea to keep auxiliary counters in database, just didn't know if it was worth. When I read about this, even not being a problem I had, I made sure to create a new table and consult database once, instead of getting data from it, then iterating over an array, filtering abducted survivors and etc... It's just avoidable complication. With these ideas, the models diagram became this:
-![final database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/final_model_diagram.png?token=AZkDI8mrsk2N2mKnk92_Fl-nvigxHdznks5bchkiwA%3D%3D)
+Two models were everything I needed to represent all the information the problem wanted. It became a problem when I realized updating a survivor location and updating a survivor information isn't the same thing to the problem (keep in mind that the real-world-information-as-data thing also applies to real world actions and functions/methods/routines - their representations in a computational world). The solution was clear: create a model to locations. 
+![final database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/final_model_diagram.png)
 
 ### Adapting to REST pattern
 
@@ -49,7 +49,30 @@ At first, I tried to define the route for this by hand since I wasn't used to th
 
 ### Listing resources
 
-For this, I made sure to NOT iterate over the entire survivors array to count abducted and non-abducted survivors. Just consulting auxiliary_counters table gives me everything I need to calculate it.
+For getting the percentages requested, I scoped the abducted and non_abducted survivors in my [survivors.rd](app/models/survivor), which generates an ActiveRecord::Relation, and I'm quite sure rails takes care of caching it, so I don't have to worry that much about performance here, rails will do the trick.
+
+## Ok, but how do I use it?
+
+I plan on deploying it, but if you can't wait for an alien apocalypse, then you may try:
+
+1. Clone the repository
+    
+    $ git clone https://github.com/puckmanxy/x-sunit
+
+2. Install dependencies
+
+    $ bundle install
+
+3. Run migrations
+
+    $ rake db:migrate
+
+4. In the folder you cloned the repository, type:
+
+    $ rails s
+
+Then go to next section and try it.
+OBS - I strongly suggest you test it with Postman or Insomnia or whatever you may want to use for testing apis.
 
 ## And what about using the API?
 
@@ -61,7 +84,7 @@ Route '/api/v1/survivors' gives access to a CRUD in survivors model, following R
 
     GET /api/v1/survivors
 
-returns a list of all survivors sorted by name
+returns response.data.survivors, an array of survivors sorted by name
 
     POST /api/v1/survivors
 
@@ -89,11 +112,11 @@ A location is a survivor atribute, so:
 
     GET /api/v1/survivors/:survivor_id/location
 
-returns a response with the the needed information about the survivor location
+returns response.data.location with the the needed information about the survivor location
 
     UPDATE /api/v1/survivors/:survivor_id/location
 
-updates the survivor, referenced by id, location as long as a JSON containing the new latitude and longitude is passed in the body of requisition.
+updates the survivor - referenced by id - location as long as a JSON containing the new latitude and longitude is passed in the body of requisition.
 
 ### Abduction Reports
 
@@ -109,8 +132,14 @@ the witness must send a JSON containing its id in the body of the requisition, l
 
 ### General information
 
-Say you just want to know about quantities and not worry about names, ages or locations. We cover you, just get the endpoint
+Say you just want to know about quantities and percentages and not to worry about names, ages or locations. We cover you, just get the endpoint
 
     GET /api/v1/general-information
 
-and you have the needed information in the body of the response.
+and you have the needed information in response.data.
+
+## And about the avaliation?
+
+Well, this challenge really made me try my best. I spent hours learning how to do stuff in a language I never used before and I'm really into Rails, even with a node-mind, it wasn't that hard to code this, since Rails really helps the programmer.
+
+At first, I was excited about the new language, so I assume I made some mistakes when modeling database, but it was necessarry, 'cause I could see that if a database isn't well defined, then a whole system may get structure problems. The most important point about doing this was how to model things... Learning to code in Rails came naturally as I needed to implement things, and I'm really satisfied about it.
