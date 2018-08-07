@@ -14,10 +14,10 @@ Once upon a time I was looking for a way to make a more consistent development w
 
 At first, I had the following models:
 
-![first database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/first_model_diagram.png)
+![first database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/master/first_model_diagram.png)
 
 Two models were everything I needed to represent all the information the problem wanted. It became a problem when I realized updating a survivor location and updating a survivor information isn't the same thing to the problem (keep in mind that the real-world-information-as-data thing also applies to real world actions and functions/methods/routines - their representations in a computational world). The solution was clear: create a model to locations. 
-![final database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/test/location-as-model/final_model_diagram.png)
+![final database models](https://raw.githubusercontent.com/PuckmanXY/X-SUNIT/master/final_model_diagram.png)
 
 ### Adapting to REST pattern
 
@@ -97,6 +97,8 @@ allow you to insert a new survivor to the database, as long as you pass a JSON f
         "latitude": 58.9356,
         "longitude": -32.0967
     }
+
+Now, to edit a survivor
 
     UPDATE /api/v1/survivors/:id
 
