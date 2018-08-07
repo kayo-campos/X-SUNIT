@@ -3,6 +3,8 @@ require_relative 'auxiliary_functions'
 module Api
     module V1
         class AbductionReportsController < ApplicationController
+            
+            ## Create a new abduction report
             def create
                 ## Having a reference to survivor and witness objects, we make sure they exist
                 survivor = Survivor.find(params[:survivor_id])
@@ -14,8 +16,6 @@ module Api
                     witnessesReportingAbduction = find_witnesses(params[:survivor_id], params[:witness_id])
                     if witnessesReportingAbduction >= 3 and survivor[:abducted] == false
                         survivor.update(abducted: true)
-                        update_auxiliary_count(1, :-)
-                        update_auxiliary_count(2, :+)
                     end
                     status = 'SUCCES'
                     data = {
@@ -38,14 +38,13 @@ module Api
                 params.permit(:survivor_id, :witness_id)
             end
 
-            ## Side-function to count how many witnesses reported survivor abduction
+            ## Side-function to count how many witnesses reported survivor abductions
             private
             def find_witnesses(survivor_id, witness_id)
                 survivorAbductionReports = AbductionReport.where('survivor_id == ?', survivor_id)
                 witnessesReportingAbduction = survivorAbductionReports.map { |report| report[:witness_id] }.uniq.count
                 return witnessesReportingAbduction
             end
-
 
             ## Side-function so the code gets clean
             private
@@ -65,17 +64,6 @@ module Api
                     message = "abduction reported"
                 end
                 return { status: status, message: message }
-            end
-
-            ## Side-function so the code gets clean
-            private
-            def update_auxiliary_count(id, operation)
-                survivorsAuxiliaryCounter = AuxiliaryCounter.find_by(id: id)
-                if operation == :+
-                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count + 1)
-                elsif operation == :-
-                    survivorsAuxiliaryCounter.update(count: survivorsAuxiliaryCounter.count - 1)
-                end
             end
         end
     end

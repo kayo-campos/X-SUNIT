@@ -4,10 +4,10 @@ module Api
     module V1
         class LocationsController < ApplicationController
             def show
-                survivor = Survivor.find(params[:survivor_id])
+                location = Location.find_by_survivor_id(params[:survivor_id])
                 status = 'SUCCESS'
                 data = {
-                    location: survivor.location
+                    location: location
                 }
                 statusCode = 200
                 render_response(status, data, statusCode)
