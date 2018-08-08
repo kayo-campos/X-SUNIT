@@ -13,7 +13,7 @@ module Api
                 if validation[:status]
                     abductionReport = AbductionReport.new(abduction_report_params)
                     abductionReport.save
-                    witnessesReportingAbduction = find_witnesses(params[:survivor_id], params[:witness_id])
+                    witnessesReportingAbduction = find_witnesses(survivor.id)
                     if witnessesReportingAbduction >= 3 and survivor[:abducted] == false
                         survivor.update(abducted: true)
                     end
@@ -40,8 +40,8 @@ module Api
 
             ## Side-function to count how many witnesses reported survivor abductions
             private
-            def find_witnesses(survivor_id, witness_id)
-                survivorAbductionReports = AbductionReport.where('survivor_id == ?', survivor_id)
+            def find_witnesses(survivor_id)
+                survivorAbductionReports = AbductionReport.find_by(survivor_id: survivor_id)
                 witnessesReportingAbduction = survivorAbductionReports.map { |report| report[:witness_id] }.uniq.count
                 return witnessesReportingAbduction
             end
@@ -54,7 +54,7 @@ module Api
                 if survivor.id == witness.id
                     message = "a survivor can't report his own abduction"
                 ## If a survivor already reported antoher survivor abduction, then the array below should be empty
-                elsif AbductionReport.find_by(witness_id: params[:witness_id], survivor_id: params[:survivor_id]) != nil
+                elsif AbductionReport.find_by(witness_id: witness.id, survivor_id: survivor.id) != nil
                     message = "witness already reported this abduction"
                 ## If an abducted survivor is reporting another survivor abduction, then we have a problem
                 elsif witness.abducted
