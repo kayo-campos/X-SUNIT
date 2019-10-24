@@ -1,6 +1,6 @@
 # X-SUNIT
 
-A Ruby on Rails API for an alien apocalypse.
+A Ruby on Rails API for an alien apocalypse :)
 
 ## Problem description
 
